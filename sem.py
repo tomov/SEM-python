@@ -10,6 +10,7 @@ class SEM(object):
         self.lambda = opts['lambda']
         self.initial_x = opts['initial_scene']
         self.beta = opts['beta']
+        self.eta = opts['eta']
 
         self.reset()
 
@@ -38,7 +39,7 @@ class SEM(object):
         #
         if ~self.e: # it's the very first scene
             prior = [1] # only 1 possible event type
-            self.model = LDS(len(x))
+            self.model = LDS(len(x), self.eta)
         else:
             prior = [None] * (K + 1)
             self.C = np.bincount(self.e) # C_k = number of times each event type k occurred
@@ -48,7 +49,7 @@ class SEM(object):
                 else:
                     assert k == K
                     prior[k] = self.alpha # new event type (k == K + 1)
-                    self.model[k] = LDS(len(x))
+                    self.model[k] = LDS(len(x), self.eta)
         prior = np.array(prior, dtype=float) / sum(prior) # normalize prior
 
         # Likelihood from Eq 2 and Eq 7
