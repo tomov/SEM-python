@@ -1,0 +1,18 @@
+from sem import SEM
+
+opts = {'lambda': 10, 'alpha': 0.1, 'beta': 0.2, 'eta': 0.01, 'tau': 0.1}
+s = SEM(opts)
+
+X = [[0, 0]] * 10 + [[1, 1]] * 10
+
+e, post = s.segment(X)
+
+print e
+print post
+#s.scene([0, 0])
+#s.scene([0, 0])
+#s.scene([0, 0])
+#s.scene([0, 0])
+#s.scene([1, 1])
+#s.scene([1, 1])
+#s.scene([1, 1])
