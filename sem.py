@@ -85,7 +85,10 @@ class SEM(object):
         # post[k] = P(e_n = k | s_1:n)
         # see Sam's code for derivation
         #
-        post = lik * prior;
+        if np.sum(lik) == 0: # likelihoods are noninformative -> use prior (o/w it will divide by 0)
+            post = prior
+        else:
+            post = lik * prior;
         post = post / np.sum(post) # normalize posterior
 
         print 'post = ', post
