@@ -32,7 +32,7 @@ class SEM(object):
     def scene(self, x):
         K = 0
         if self.e:
-            K = np.argmax(self.e) + 1 # current # of distinct event types
+            K = np.max(self.e) + 1 # current # of distinct event types
 
         print '\n'
         print 'x = ', x

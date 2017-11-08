@@ -3,7 +3,7 @@ from sem import SEM
 opts = {'lambda': 10, 'alpha': 0.1, 'beta': 0.00001, 'eta': 0.01, 'tau': 0.1}
 s = SEM(opts)
 
-X = [[1, 1]] * 2 + [[-1, -1]] * 2
+X = [[1, 1]] * 10 + [[-1, -1]] * 10
 
 e, post = s.segment(X)
 
