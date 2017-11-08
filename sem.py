@@ -24,7 +24,7 @@ class SEM(object):
         self.lik = []; # likelihood history P(s_i = x_i | s_i-1 = x_i-1, e_i-1 = e_i = k) for i=1..n, k=1..K    MOMCHIL: note the difference from the equation
         self.post = []; # posterior history P(e_i = k | s_1:i = x_1:i) for i=1..n, k=1..K
         self.x = []; # scene history x_i for i=1..n
-        self.next_x = []; # prediction history x_s' = E(lik) = f(x_s; e, theta) for i=1..n
+        self.predicted_x = []; # prediction history x_s' = E(lik) = f(x_s; e, theta) for i=1..n
 
     # process a single scene x_s
     # for online processing
@@ -64,18 +64,20 @@ class SEM(object):
         # Likelihood from Eq 2 and Eq 7
         # lik[k] = P(s_n = x_s | s_n-1, e_n = e_n-1 = k)       MOMCHIL: note the difference from the equation
         #
-        next_x = [None] * (K + 1) # next scene x_s' = f(x_s, e = k, theta), for each event type k
+        predicted_x = [None] * (K + 1) # predicted scene x_s' = f(x_s, e = k, theta), for each event type k
         lik = [None] * (K + 1)
         for k in range(K + 1):
             if not self.x: # or self.e[-1] != k:
                 # it's the very first scene OR the previous event type is different
                 # MOMCHIL: note the difference from Sam's code: it doesn't make sense unless we're resegmenting
                 # MOMCHIL: scratch that; we basically are admitting that the previous scene was segmented incorrectl, however we're accepting this as a loss and just moving along
-                next_x[k] = self.model[k].initial_x()
+                predicted_x[k] = self.model[k].initial_x()
             else:
-                next_x[k] = self.model[k].next_x(self.x[-1])
-            lik[k] = multivariate_normal.pdf(x, next_x[k], self.beta * np.eye(len(x))) # Eq 2 TODO replace with log likelihood from Eq 7
+                predicted_x[k] = self.model[k].next_x(self.x[-1])
+            print "x_s'[", k, "] = ", predicted_x[k]
+            lik[k] = multivariate_normal.pdf(x, predicted_x[k], self.beta * np.eye(len(x))) # Eq 2 TODO replace with log likelihood from Eq 7
         lik = np.array(lik, dtype=float)
+        # lik = lik / np.sum(lik)
 
         print 'lik = ', lik
 
@@ -92,15 +94,17 @@ class SEM(object):
         self.e.append(np.argmax(post))
 
         # update event model of MAP event type
-        prev_x = self.x[-1] if self.x else self.model[self.e[-1]].initial_x() # if no previous scene, use default initial scene
-        self.model[self.e[-1]].update(prev_x, x)
+        if self.x: # don't update on first scene -- no past!
+            self.model[self.e[-1]].update(self.x[-1], x)
+            print self.model[self.e[-1]].b
+            print self.model[self.e[-1]].W
 
         # update histories
         self.lik.append(lik)
         self.prior.append(prior)
         self.post.append(post)
         self.x.append(x)
-        self.next_x.append(next_x)
+        self.predicted_x.append(predicted_x)
 
         return self.e[-1], post
 

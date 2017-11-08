@@ -1,9 +1,9 @@
 from sem import SEM
 
-opts = {'lambda': 10, 'alpha': 0.1, 'beta': 0.2, 'eta': 0.01, 'tau': 0.1}
+opts = {'lambda': 10, 'alpha': 0.1, 'beta': 0.00001, 'eta': 0.01, 'tau': 0.1}
 s = SEM(opts)
 
-X = [[0, 0]] * 10 + [[1, 1]] * 10
+X = [[1, 1]] * 2 + [[-1, -1]] * 2
 
 e, post = s.segment(X)
 

@@ -18,7 +18,7 @@ class LDS(object):
         assert len(x) == self.D
         x = np.array(x, dtype=float)
         x.resize((self.D, 1))
-        next_x = self.b.transpose() + np.dot(x.transpose(), self.W)
+        next_x = self.b.transpose() + np.dot(x.transpose(), self.W) # Eq 3 
         assert next_x.shape == (1, self.D)
         return list(next_x.flat)
 
